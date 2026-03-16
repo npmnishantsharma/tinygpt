@@ -39,9 +39,10 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # ─── Load model ──────────────────────────────────────────────────────────────
 
-def load_model(checkpoint_path: str) -> GPT:
+def load_model(checkpoint_path: str, device: str | None = None) -> GPT:
     print(f"Loading checkpoint: {checkpoint_path}")
-    ckpt = torch.load(checkpoint_path, map_location=DEVICE, weights_only=False)
+    target_device = device or DEVICE
+    ckpt = torch.load(checkpoint_path, map_location=target_device, weights_only=False)
 
     # Reconstruct config from checkpoint if available (handles modified configs)
     from config import ModelConfig
@@ -49,7 +50,7 @@ def load_model(checkpoint_path: str) -> GPT:
     cfg = ModelConfig(**{k: v for k, v in cfg_dict.items()
                          if k in ModelConfig.__dataclass_fields__})
 
-    model = GPT(cfg).to(DEVICE)
+    model = GPT(cfg).to(target_device)
     model.load_state_dict(ckpt["model_state"])
     model.eval()
 
@@ -66,13 +67,70 @@ def load_tokenizer() -> spm.SentencePieceProcessor:
     return sp
 
 
-def encode(sp: spm.SentencePieceProcessor, text: str) -> torch.Tensor:
+def encode(sp: spm.SentencePieceProcessor, text: str, device: str | None = None) -> torch.Tensor:
     ids = sp.encode(text)
-    return torch.tensor(ids, dtype=torch.long, device=DEVICE).unsqueeze(0)   # (1, T)
+    dev = device or DEVICE
+    return torch.tensor(ids, dtype=torch.long, device=dev).unsqueeze(0)   # (1, T)
 
 
 def decode(sp: spm.SentencePieceProcessor, ids: torch.Tensor) -> str:
     return sp.decode(ids.squeeze(0).tolist())
+
+
+# ─── Notebook-friendly helpers ────────────────────────────────────────────────
+
+def init_chat(
+    checkpoint: str | None = None,
+    device: str | None = None,
+) -> tuple[GPT, spm.SentencePieceProcessor]:
+    """
+    Convenience helper for Kaggle/Colab notebooks.
+
+    Usage (in a notebook cell):
+
+        from chat import init_chat, chat_once
+        model, sp = init_chat()  # or init_chat(\"checkpoints/my_ckpt.pt\")
+        print(chat_once(model, sp, \"Hello!\"))}
+
+    """
+    ckpt_path = checkpoint or inf_cfg.checkpoint
+    model = load_model(ckpt_path, device=device)
+    sp = load_tokenizer()
+    return model, sp
+
+
+@torch.no_grad()
+def chat_once(
+    model: GPT,
+    sp: spm.SentencePieceProcessor,
+    prompt_text: str,
+    json_mode: bool = False,
+    max_new_tokens: int | None = None,
+    temperature: float | None = None,
+    top_k: int | None = None,
+    top_p: float | None = None,
+    device: str | None = None,
+) -> str:
+    """
+    Single-turn chat helper for notebooks.
+
+    Example:
+
+        model, sp = init_chat()
+        reply = chat_once(model, sp, \"Explain attention.\")
+        print(reply)
+    """
+    gen_kwargs = dict(
+        max_new_tokens=max_new_tokens or inf_cfg.max_new_tokens,
+        temperature=temperature or inf_cfg.temperature,
+        top_k=top_k or inf_cfg.top_k,
+        top_p=top_p or inf_cfg.top_p,
+    )
+    prompt = build_prompt(prompt_text, json_mode=json_mode)
+    response = generate_response(model, sp, prompt, device=device, **gen_kwargs)
+    if json_mode:
+        response = try_parse_json(response)
+    return response
 
 
 # ─── Build prompt ────────────────────────────────────────────────────────────
@@ -101,8 +159,9 @@ def generate_response(
     temperature: float,
     top_k: int,
     top_p: float,
+    device: str | None = None,
 ) -> str:
-    idx = encode(sp, prompt)
+    idx = encode(sp, prompt, device=device)
     prompt_len = idx.size(1)
 
     output_ids = model.generate(
