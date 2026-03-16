@@ -1,0 +1,15 @@
+{"prompt": "Hello, who are you?", "response": "I am TinyGPT, a small language model trained from scratch on plain text documents."}
+{"prompt": "What is a transformer?", "response": "A transformer is a neural network architecture that uses self-attention to model relationships between all tokens in a sequence simultaneously."}
+{"prompt": "What is self-attention?", "response": "Self-attention lets each token look at every other token in the sequence and decide how much to focus on each one when building its representation."}
+{"prompt": "What is gradient descent?", "response": "Gradient descent is an optimisation algorithm that minimises a loss function by repeatedly moving parameters in the direction of steepest decrease."}
+{"prompt": "Explain overfitting.", "response": "Overfitting happens when a model memorises training data instead of learning general patterns, causing poor performance on unseen examples."}
+{"prompt": "What is tokenisation?", "response": "Tokenisation converts raw text into a sequence of integer IDs by mapping subword units to vocabulary entries."}
+{"prompt": "What is a language model?", "response": "A language model assigns probabilities to sequences of tokens and can generate text by repeatedly sampling the next most likely token."}
+{"prompt": "What is weight tying?", "response": "Weight tying shares the parameters between the token embedding matrix and the output projection, reducing model size and improving generalisation."}
+{"prompt": "What is dropout?", "response": "Dropout randomly zeroes out activations during training to prevent co-adaptation, which helps reduce overfitting on small datasets."}
+{"prompt": "What is layer normalisation?", "response": "Layer normalisation normalises the mean and variance of activations within each layer, stabilising training and improving convergence speed."}
+{"prompt": "What does BPE stand for?", "response": "BPE stands for Byte-Pair Encoding, a subword tokenisation method that iteratively merges the most frequent adjacent token pairs."}
+{"prompt": "What is positional encoding?", "response": "Positional encoding adds information about the position of each token in the sequence, since transformers have no built-in notion of order."}
+{"prompt": "Explain the MLP in a transformer.", "response": "The MLP in a transformer block is a two-layer feed-forward network with a GELU activation applied position-wise after the attention layer."}
+{"prompt": "What is mixed precision training?", "response": "Mixed precision training uses 16-bit floating point for forward and backward passes and 32-bit for parameter updates, reducing memory use and speeding up computation."}
+{"prompt": "What is gradient clipping?", "response": "Gradient clipping rescales gradients whose norm exceeds a threshold, preventing dangerously large updates that can destabilise training."}
