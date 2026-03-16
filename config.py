@@ -98,7 +98,7 @@ class TrainConfig:
 @dataclass
 class SFTConfig:
     sft_data_file: str = "data/sft_examples.jsonl"   # one {"prompt":..,"response":..} per line
-    base_checkpoint: str = "checkpoints/pretrain_best.pt"
+    base_checkpoint: str = "checkpoints/pretrain_final.pt"
     output_checkpoint: str = "checkpoints/sft_final.pt"
 
     batch_size: int = 2
