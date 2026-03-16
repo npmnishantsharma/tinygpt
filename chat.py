@@ -1,5 +1,5 @@
 """
-chat.py — Minimal CLI for local inference with TinyGPT.
+chat.py — Minimal CLI for local inference with SmallGPT.
 
 Usage:
     # Normal chat
@@ -202,7 +202,7 @@ def try_parse_json(text: str) -> str:
 # ─── CLI ─────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="TinyGPT Chat")
+    parser = argparse.ArgumentParser(description="SmallGPT Chat")
     parser.add_argument("--checkpoint",   default=inf_cfg.checkpoint)
     parser.add_argument("--max_tokens",   type=int,   default=inf_cfg.max_new_tokens)
     parser.add_argument("--temperature",  type=float, default=inf_cfg.temperature)
@@ -232,7 +232,7 @@ def main():
         return
 
     # ── Interactive chat loop ─────────────────────────────────────────────────
-    print("TinyGPT — type your message, 'quit' to exit, 'reset' to clear history.")
+    print("SmallGPT — type your message, 'quit' to exit, 'reset' to clear history.")
     print("─" * 60)
 
     conversation_context = ""   # simple stateless context (no memory beyond block_size)
@@ -269,7 +269,7 @@ def main():
         if args.json:
             response = try_parse_json(response)
 
-        print(f"\nTinyGPT: {response}")
+        print(f"\nSmallGPT: {response}")
 
         # Append to context for next turn
         conversation_context += f"\n{prompt} {response} {sft_cfg.end_token}"
