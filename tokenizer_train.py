@@ -64,6 +64,9 @@ spm.SentencePieceTrainer.train(
     input_sentence_size=2_000_000,         # max sentences sampled for training
     shuffle_input_sentence=True,
     normalization_rule_name="nmt_nfkc_cf", # lower-case + unicode normalisation
+    # Small corpora can't always support large vocab sizes. Let SentencePiece
+    # automatically pick a smaller effective vocab instead of erroring.
+    hard_vocab_limit=False,
 )
 
 print(f"Tokenizer saved to {tok_cfg.model_prefix}.model and .vocab")
